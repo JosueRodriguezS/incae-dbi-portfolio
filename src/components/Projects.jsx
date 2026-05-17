@@ -1,4 +1,4 @@
-import { useState, Suspense, lazy } from 'react'
+import { useState, useRef, useEffect, Suspense, lazy } from 'react'
 
 const HuaweiDashboard = lazy(() => import('./dashboards/HuaweiDashboard'))
 const FCCDashboard    = lazy(() => import('./dashboards/FCCDashboard'))
@@ -39,8 +39,18 @@ const PROJECTS = [
 
 export default function Projects() {
   const [active, setActive] = useState(null)
+  const panelRef = useRef(null)
 
-  const toggle = (id) => setActive(prev => (prev === id ? null : id))
+  const select = (id) => {
+    setActive(prev => (prev === id ? null : id))
+  }
+
+  // Scroll the dashboard panel into view whenever a new one opens
+  useEffect(() => {
+    if (active && panelRef.current) {
+      panelRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }, [active])
 
   const activeProject = PROJECTS.find(p => p.id === active)
 
@@ -56,46 +66,81 @@ export default function Projects() {
         </div>
       </div>
 
-      <div className="projects-grid">
-        {PROJECTS.map(project => (
-          <button
-            key={project.id}
-            type="button"
-            className={`project-card reveal${active === project.id ? ' project-card--active' : ''}`}
-            onClick={() => toggle(project.id)}
-            aria-expanded={active === project.id}
-            aria-label={`${project.title} — ${active === project.id ? 'cerrar' : 'abrir'} dashboard`}
-          >
-            <div className="project-card__num">{project.num}</div>
-            <h3 className="project-card__title">{project.title}</h3>
-            <p className="project-card__subtitle">{project.subtitle}</p>
-            <p className="project-card__desc">{project.description}</p>
-            <div className="project-card__tags">
-              {project.tags.map(tag => (
-                <span key={tag} className="tag">{tag}</span>
-              ))}
-            </div>
-            <span className="project-card__cta">
-              {active === project.id ? '↑ Cerrar dashboard' : '↓ Ver dashboard'}
-            </span>
-          </button>
-        ))}
+      {/* Cards — always visible, act as persistent tabs */}
+      <div className={`projects-grid${active ? ' projects-grid--has-active' : ''}`}>
+        {PROJECTS.map(project => {
+          const isActive   = active === project.id
+          const isInactive = active !== null && !isActive
+          return (
+            <button
+              key={project.id}
+              type="button"
+              className={[
+                'project-card',
+                isActive   ? 'project-card--active'   : '',
+                isInactive ? 'project-card--inactive' : '',
+              ].join(' ').trim()}
+              onClick={() => select(project.id)}
+              aria-expanded={isActive}
+              aria-label={`${project.title} — ${isActive ? 'cerrar' : 'abrir'} dashboard`}
+            >
+              {/* Active indicator strip at bottom connecting to panel */}
+              {isActive && <span className="project-card__connector" aria-hidden="true" />}
+
+              <div className="project-card__num">{project.num}</div>
+              <h3 className="project-card__title">{project.title}</h3>
+              <p className="project-card__subtitle">{project.subtitle}</p>
+              <p className="project-card__desc">{project.description}</p>
+              <div className="project-card__tags">
+                {project.tags.map(tag => (
+                  <span key={tag} className="tag">{tag}</span>
+                ))}
+              </div>
+              <span className="project-card__cta">
+                {isActive ? '↑ Cerrar dashboard' : '↓ Ver dashboard'}
+              </span>
+            </button>
+          )
+        })}
       </div>
 
+      {/* Dashboard panel — slides in below the card grid */}
       {active && activeProject && (() => {
         const ActiveDashboard = activeProject.component
         return (
-          <div className="dashboard-panel" role="region" aria-label="Dashboard activo">
+          <div
+            ref={panelRef}
+            className="dashboard-panel"
+            role="region"
+            aria-label={`Dashboard: ${activeProject.title}`}
+          >
             <div className="dashboard-panel__header">
-              <span className="dashboard-panel__title">{activeProject.title}</span>
-              <button
-                type="button"
-                className="dashboard-panel__close"
-                onClick={() => setActive(null)}
-                aria-label="Cerrar dashboard"
-              >
-                ✕ Cerrar
-              </button>
+              <div className="dashboard-panel__meta">
+                <span className="dashboard-panel__num">{activeProject.num}</span>
+                <span className="dashboard-panel__title">{activeProject.title}</span>
+                <span className="dashboard-panel__subtitle">{activeProject.subtitle}</span>
+              </div>
+              <div className="dashboard-panel__actions">
+                {PROJECTS.map(p => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`dashboard-panel__tab${p.id === active ? ' dashboard-panel__tab--active' : ''}`}
+                    onClick={() => select(p.id)}
+                    aria-pressed={p.id === active}
+                  >
+                    {p.num}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className="dashboard-panel__close"
+                  onClick={() => setActive(null)}
+                  aria-label="Cerrar dashboard"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="dashboard-panel__body">
               <Suspense fallback={<div className="dashboard-loading">Cargando dashboard…</div>}>
