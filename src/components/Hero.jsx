@@ -30,7 +30,7 @@ export default function Hero() {
           <GitHubIcon /> GitHub
         </a>
         <a
-          href="https://linkedin.com/in/josue-rodriguez-solis"
+          href="https://www.linkedin.com/in/josue-rodriguez-solis-a2197a243"
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn--ghost"

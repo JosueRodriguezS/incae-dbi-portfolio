@@ -7,7 +7,7 @@ const LINKS = [
     icon: GitHubIcon,
   },
   {
-    href: 'https://linkedin.com/in/josue-rodriguez-solis',
+    href: 'https://www.linkedin.com/in/josue-rodriguez-solis-a2197a243',
     platform: 'LinkedIn',
     handle: 'josue-rodriguez-solis',
     iconClass: 'contact-card__icon--linkedin',

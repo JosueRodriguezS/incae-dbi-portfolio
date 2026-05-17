@@ -61,6 +61,7 @@ export default function Nav() {
       </ul>
 
       <button
+        type="button"
         className={`nav-toggle${open ? ' nav-toggle--active' : ''}`}
         aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
         aria-expanded={open}
