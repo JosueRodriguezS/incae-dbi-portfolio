@@ -33,7 +33,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 img, svg { display: block; max-width: 100%; }
-button { cursor: pointer; }
+button { cursor: pointer; font: inherit; border: none; background: none; }
 a { color: inherit; }
 
 /* ─── BACKGROUND FX ──────────────────────────────────────── */

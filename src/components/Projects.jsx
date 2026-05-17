@@ -59,9 +59,11 @@ export default function Projects() {
         {PROJECTS.map(project => (
           <button
             key={project.id}
+            type="button"
             className={`project-card reveal${active === project.id ? ' project-card--active' : ''}`}
             onClick={() => toggle(project.id)}
             aria-expanded={active === project.id}
+            aria-label={`${project.title} — ${active === project.id ? 'cerrar' : 'abrir'} dashboard`}
           >
             <div className="project-card__num">{project.num}</div>
             <h3 className="project-card__title">{project.title}</h3>
@@ -79,23 +81,27 @@ export default function Projects() {
         ))}
       </div>
 
-      {active && activeProject && (
-        <div className="dashboard-panel" role="region" aria-label="Dashboard activo">
-          <div className="dashboard-panel__header">
-            <span className="dashboard-panel__title">{activeProject.title}</span>
-            <button
-              className="dashboard-panel__close"
-              onClick={() => setActive(null)}
-              aria-label="Cerrar dashboard"
-            >
-              ✕ Cerrar
-            </button>
+      {active && activeProject && (() => {
+        const ActiveDashboard = activeProject.component
+        return (
+          <div className="dashboard-panel" role="region" aria-label="Dashboard activo">
+            <div className="dashboard-panel__header">
+              <span className="dashboard-panel__title">{activeProject.title}</span>
+              <button
+                type="button"
+                className="dashboard-panel__close"
+                onClick={() => setActive(null)}
+                aria-label="Cerrar dashboard"
+              >
+                ✕ Cerrar
+              </button>
+            </div>
+            <div className="dashboard-panel__body">
+              <ActiveDashboard />
+            </div>
           </div>
-          <div className="dashboard-panel__body">
-            <activeProject.component />
-          </div>
-        </div>
-      )}
+        )
+      })()}
     </section>
   )
 }

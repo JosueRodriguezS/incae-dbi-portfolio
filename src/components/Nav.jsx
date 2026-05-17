@@ -25,7 +25,7 @@ export default function Nav() {
       if (!el) return null
       const ob = new IntersectionObserver(
         ([e]) => { if (e.isIntersecting) setActive(id) },
-        { rootMargin: '-40% 0px -55% 0px' }
+        { rootMargin: '-10% 0px -80% 0px' }
       )
       ob.observe(el)
       return ob
