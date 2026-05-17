@@ -755,6 +755,18 @@ main { position: relative; z-index: 1; }
 
 .footer-links a:hover { color: var(--accent); }
 
+/* ─── DASHBOARD LOADING ──────────────────────────────────── */
+.dashboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
 /* ─── SCROLL REVEAL ──────────────────────────────────────── */
 .reveal {
   opacity: 0;

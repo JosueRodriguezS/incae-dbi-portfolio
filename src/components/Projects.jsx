@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import HuaweiDashboard from './dashboards/HuaweiDashboard'
-import FCCDashboard from './dashboards/FCCDashboard'
-import RAPSDashboard from './dashboards/RAPSDashboard'
+import { useState, Suspense, lazy } from 'react'
+
+const HuaweiDashboard = lazy(() => import('./dashboards/HuaweiDashboard'))
+const FCCDashboard    = lazy(() => import('./dashboards/FCCDashboard'))
+const RAPSDashboard   = lazy(() => import('./dashboards/RAPSDashboard'))
 
 const PROJECTS = [
   {
@@ -97,7 +98,9 @@ export default function Projects() {
               </button>
             </div>
             <div className="dashboard-panel__body">
-              <ActiveDashboard />
+              <Suspense fallback={<div className="dashboard-loading">Cargando dashboard…</div>}>
+                <ActiveDashboard />
+              </Suspense>
             </div>
           </div>
         )
