@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, Suspense, lazy } from 'react'
 
-const HuaweiDashboard = lazy(() => import('./dashboards/HuaweiDashboard'))
-const FCCDashboard    = lazy(() => import('./dashboards/FCCDashboard'))
-const RAPSDashboard   = lazy(() => import('./dashboards/RAPSDashboard'))
+const HuaweiDashboard     = lazy(() => import('./dashboards/HuaweiDashboard'))
+const FCCDashboard        = lazy(() => import('./dashboards/FCCDashboard'))
+const RAPSDashboard       = lazy(() => import('./dashboards/RAPSDashboard'))
+const DBVertriebDashboard = lazy(() => import('./dashboards/DBVertriebDashboard'))
 
 const PROJECTS = [
   {
@@ -34,6 +35,16 @@ const PROJECTS = [
       'Dashboard analítico del caso RAPS, explorando métricas de desempeño operativo y su relación con decisiones de gobernanza de datos en contextos de alta complejidad empresarial.',
     tags: ['Operaciones', 'BI', 'React', 'Recharts', 'Lucide'],
     component: RAPSDashboard,
+  },
+  {
+    id: 'dbvertrieb',
+    num: '04',
+    title: 'Caso DB Vertrieb',
+    subtitle: 'Agilidad Operativa & Transformación Bimodal IT',
+    description:
+      'Dashboard longitudinal (2005–2018, 948 observaciones) del journey de transformación digital de Deutsche Bahn Vertrieb. OKR framework de agilidad operativa, análisis por fase de IT (bimodal separado → reintegrado), y chatbot analítico con contexto del caso.',
+    tags: ['Agilidad Operativa', 'Bimodal IT', 'SAFe', 'OKR', 'AI Analyst', 'Recharts'],
+    component: DBVertriebDashboard,
   },
 ]
 
