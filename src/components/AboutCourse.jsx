@@ -1,16 +1,18 @@
+import { PillarBridgeIcon, PillarEvidenceIcon, PillarBoundaryIcon } from './icons'
+
 const PILLARS = [
   {
-    icon: '⚙️',
+    Icon: PillarBridgeIcon,
     title: 'Puente técnico-estratégico',
     body: 'Los ingenieros de datos raramente participan en conversaciones de gobernanza. Este portafolio documenta cómo construir ese puente desde la arquitectura de datos hasta la sala de directivos.',
   },
   {
-    icon: '📊',
+    Icon: PillarEvidenceIcon,
     title: 'Evidencia de aprendizaje',
     body: 'Cada semana produce un data product concreto. Este espacio articula el razonamiento detrás de cada decisión de diseño, no solo acumula entregables.',
   },
   {
-    icon: '🤝',
+    Icon: PillarBoundaryIcon,
     title: 'Objeto de frontera',
     body: 'Diseñado para ser útil tanto a equipos técnicos como a liderazgo ejecutivo — un boundary object que inicia conversaciones entre perfiles distintos sobre datos y gobernanza.',
   },
@@ -37,11 +39,11 @@ export default function AboutCourse() {
           <div className="course-card__divider" />
           <div className="course-meta">
             {[
-              ['Institución',  'INCAE Business School'],
-              ['Profesor',     'Juan Carlos Barahona'],
-              ['Duración',     '7 semanas · 6 data products'],
-              ['Año',          '2026'],
-              ['Plataforma',   'GitHub Pages'],
+              ['Institución', 'INCAE Business School'],
+              ['Profesor',    'Juan Carlos Barahona'],
+              ['Duración',    '7 semanas · 6 data products'],
+              ['Año',         '2026'],
+              ['Plataforma',  'GitHub Pages'],
             ].map(([label, value]) => (
               <div key={label} className="course-meta__row">
                 <span className="course-meta__label">{label}</span>
@@ -52,9 +54,11 @@ export default function AboutCourse() {
         </div>
 
         <div className="course-pillars">
-          {PILLARS.map(({ icon, title, body }) => (
+          {PILLARS.map(({ Icon, title, body }) => (
             <div key={title} className="pillar reveal">
-              <div className="pillar__icon" aria-hidden="true">{icon}</div>
+              <div className="pillar__icon">
+                <Icon size={20} />
+              </div>
               <h4 className="pillar__title">{title}</h4>
               <p className="pillar__body">{body}</p>
             </div>

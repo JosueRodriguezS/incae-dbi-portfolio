@@ -1,0 +1,252 @@
+/* ─── PROJECT CARDS ──────────────────────────────────────────── */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
+  /* Cards are always visible — they act as persistent tab navigation */
+}
+
+.project-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius) var(--radius) 0 0; /* flat bottom when panel opens below */
+  padding: 2rem;
+  text-align: left;
+  width: 100%;
+  position: relative;
+  overflow: visible;
+  transition: border-color var(--ease), opacity var(--ease), transform var(--ease), background var(--ease);
+}
+
+/* Gradient top accent — visible on hover and when active */
+.project-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -1px; right: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  opacity: 0;
+  transition: opacity var(--ease);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.project-card:hover { border-color: rgba(56, 189, 248, 0.5); }
+.project-card:hover::before { opacity: 0.6; }
+
+/* Active state — clearly selected tab */
+.project-card--active {
+  background: var(--surface2);
+  border-color: var(--accent);
+  border-bottom-color: var(--surface2); /* merges visually with panel */
+  z-index: 2;
+}
+.project-card--active::before { opacity: 1; }
+
+/* Connector line from active card bottom to panel */
+.project-card__connector {
+  position: absolute;
+  bottom: -1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 1.5rem;
+  background: var(--accent);
+  opacity: 0.6;
+}
+
+/* Inactive — dimmed but readable, still clearly clickable */
+.project-card--inactive {
+  opacity: 0.45;
+  transform: scale(0.98);
+}
+.project-card--inactive:hover {
+  opacity: 0.8;
+  transform: scale(1);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.project-card__num {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  margin-bottom: 1rem;
+}
+
+.project-card__title {
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  color: var(--white);
+  margin-bottom: 0.3rem;
+}
+
+.project-card__subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  color: var(--accent2);
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+
+.project-card__desc {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 1.25rem;
+}
+
+.project-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 2px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  color: var(--accent);
+}
+
+.project-card__cta {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+
+/* ─── DASHBOARD PANEL ────────────────────────────────────────── */
+.dashboard-panel {
+  border: 1px solid var(--accent);
+  border-top: none;           /* merges with active card bottom edge */
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  animation: slideDown 0.3s ease;
+}
+
+.dashboard-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+.dashboard-panel__meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+
+.dashboard-panel__num {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+
+.dashboard-panel__title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.dashboard-panel__subtitle {
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Quick-switch tabs inside the panel header */
+.dashboard-panel__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.dashboard-panel__tab {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.25rem 0.55rem;
+  transition: color var(--ease), border-color var(--ease), background var(--ease);
+}
+
+.dashboard-panel__tab:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.dashboard-panel__tab--active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.dashboard-panel__close {
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+  margin-left: 0.4rem;
+  transition: color var(--ease), border-color var(--ease);
+}
+
+.dashboard-panel__close:hover { color: var(--white); border-color: var(--muted); }
+
+.dashboard-panel__body {
+  background: var(--surface);
+  overflow: auto;
+  max-height: 90vh;
+}
+
+/* ─── DASHBOARD IFRAME ───────────────────────────────────────── */
+.dashboard-iframe-wrapper { width: 100%; }
+
+.dashboard-iframe {
+  width: 100%;
+  height: 820px;
+  border: none;
+  display: block;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .projects-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+  .projects-grid { grid-template-columns: 1fr; }
+
+  /* On mobile, cards stack vertically — restore full border-radius */
+  .project-card { border-radius: var(--radius); }
+  .project-card--active { border-bottom-color: var(--accent); }
+  .project-card__connector { display: none; }
+
+  /* Panel becomes a full-bordered box on mobile */
+  .dashboard-panel { border-top: 1px solid var(--accent); border-radius: var(--radius); }
+  .dashboard-panel__subtitle { display: none; }
+  .dashboard-iframe { height: 600px; }
+}
