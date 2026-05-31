@@ -4,6 +4,7 @@ const HuaweiDashboard     = lazy(() => import('./dashboards/HuaweiDashboard'))
 const FCCDashboard        = lazy(() => import('./dashboards/FCCDashboard'))
 const RAPSDashboard       = lazy(() => import('./dashboards/RAPSDashboard'))
 const DBVertriebDashboard = lazy(() => import('./dashboards/DBVertriebDashboard'))
+const AXADashboard        = lazy(() => import('./dashboards/AXADashboard'))
 
 const PROJECTS = [
   {
@@ -45,6 +46,16 @@ const PROJECTS = [
       'Dashboard longitudinal (2005–2018, 948 observaciones) del journey de transformación digital de Deutsche Bahn Vertrieb. OKR framework de agilidad operativa, análisis por fase de IT (bimodal separado → reintegrado), y chatbot analítico con contexto del caso.',
     tags: ['Agilidad Operativa', 'Bimodal IT', 'SAFe', 'OKR', 'AI Analyst', 'Recharts'],
     component: DBVertriebDashboard,
+  },
+  {
+    id: 'axa',
+    num: '05',
+    title: 'Caso AXA Germany',
+    subtitle: 'Intelligence Brief — Data Innovation Lab 2016–2018',
+    description:
+      'Dashboard agéntico de AXA Germany: 339 registros operativos del Data Innovation Lab analizados a través del marco de los seis pivotes de evolución digital y OKR/BSC. Incluye filtros interactivos por año y unidad, análisis de madurez por pivote, condiciones de mercado 2025–2026 y trazabilidad completa del flujo de trabajo agéntico.',
+    tags: ['Agentes de IA', 'Intelligence Brief', 'OKR / BSC', '6 Pivotes', 'Chart.js', 'HTML Autónomo'],
+    component: AXADashboard,
   },
 ]
 
