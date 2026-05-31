@@ -1423,89 +1423,121 @@ function switchTab(id) {
 }
 
 
-// ── EXPORT PDF ──
+// ── EXPORT PDF (section-by-section · landscape A4 · scale 2) ──
 function exportPDF() {
-  var btn = document.querySelector('.export-btn');
-  if (btn) { btn.textContent = 'Generando...'; btn.disabled = true; }
-
-  var dash = document.getElementById('tab-dashboard');
-  var meta = document.getElementById('tab-metodo');
-  var backTop = document.getElementById('backToTop');
-  var subnav = document.getElementById('dash-subnav');
+  var btn       = document.querySelector('.export-btn');
+  var subnav    = document.getElementById('dash-subnav');
   var filterBar = document.querySelector('.filter-bar');
-  var agentBanner = document.querySelector('.agent-banner');
+  var agBanner  = document.querySelector('.agent-banner');
+  var backTop   = document.getElementById('backToTop');
+  var dash      = document.getElementById('tab-dashboard');
+  var meta      = document.getElementById('tab-metodo');
 
-  // Store states
+  var scrollPos      = window.scrollY;
   var metaWasVisible = meta && meta.style.display !== 'none';
-  var scrollPos = window.scrollY;
 
-  // Prepare for capture
+  function restore() {
+    [subnav, filterBar, agBanner, backTop].forEach(function(el) {
+      if (el) el.style.visibility = '';
+    });
+    if (btn) btn.style.visibility = '';
+    document.querySelectorAll('.pivote-detail').forEach(function(d) { d.style.display = ''; });
+    if (metaWasVisible && meta) { meta.style.display = 'block'; if (dash) dash.style.display = 'none'; }
+    window.scrollTo(0, scrollPos);
+    if (btn) { btn.innerHTML = '<span>⬇</span> Exportar PDF'; btn.disabled = false; }
+  }
+
+  // ── Prepare DOM ──
+  if (btn) { btn.innerHTML = '<span>⏳</span> Preparando…'; btn.disabled = true; }
   if (meta) meta.style.display = 'none';
   if (dash) dash.style.display = 'block';
-  if (backTop) backTop.style.display = 'none';
-  if (subnav) subnav.style.visibility = 'hidden';
-  if (filterBar) filterBar.style.visibility = 'hidden';
-  if (agentBanner) agentBanner.style.visibility = 'hidden';
+  [subnav, filterBar, agBanner, backTop].forEach(function(el) {
+    if (el) el.style.visibility = 'hidden';
+  });
+  if (btn) btn.style.visibility = 'hidden';
+  // Close any open pivote detail panels for clean layout
+  document.querySelectorAll('.pivote-detail').forEach(function(d) { d.style.display = 'none'; });
+  document.querySelectorAll('.pivote-card').forEach(function(c) { c.classList.remove('selected'); });
   window.scrollTo(0, 0);
 
-  var target = dash || document.body;
+  // ── Sections to capture in order ──
+  var TARGETS = [
+    { id: null,          label: 'Portada',         el: document.querySelector('.hero') },
+    { id: 'executive',   label: 'Ejecutivo'         },
+    { id: 'evolution',   label: 'Evolución'         },
+    { id: 'pivotes',     label: '6 Pivotes'         },
+    { id: 'initiatives', label: 'Iniciativas'       },
+    { id: 'market',      label: 'Mercado'           },
+    { id: 'recs',        label: 'Recomendaciones'   },
+  ].map(function(t) {
+    return { el: t.el || document.getElementById(t.id), label: t.label };
+  }).filter(function(t) { return !!t.el; });
 
-  setTimeout(function() {
-    html2canvas(target, {
-      scale: 1.5,
+  var pdf = new window.jspdf.jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4',
+    compress: true
+  });
+  var PW = pdf.internal.pageSize.getWidth();   // 297 mm
+  var PH = pdf.internal.pageSize.getHeight();  // 210 mm
+  var isFirst = true;
+  var idx = 0;
+
+  function captureNext() {
+    if (idx >= TARGETS.length) {
+      // ── Stamp footer on every page ──
+      var total = pdf.internal.getNumberOfPages();
+      for (var p = 1; p <= total; p++) {
+        pdf.setPage(p);
+        pdf.setFontSize(7);
+        pdf.setTextColor(110, 110, 110);
+        pdf.text(
+          'AXA Germany · Intelligence Brief 2016–2018 · INCAE DBI S2 2026 · Josué Rodríguez Solís',
+          PW / 2, PH - 3, { align: 'center' }
+        );
+        pdf.text('Página ' + p + ' / ' + total, PW - 8, PH - 3, { align: 'right' });
+      }
+      pdf.save('AXA-Intelligence-Brief-2016-2018.pdf');
+      restore();
+      return;
+    }
+
+    var t = TARGETS[idx];
+    if (btn) btn.innerHTML = '<span>⏳</span> ' + t.label + ' · ' + (idx + 1) + ' / ' + TARGETS.length;
+
+    html2canvas(t.el, {
+      scale: 2,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#0a0c10',
-      scrollY: 0,
+      logging: false,
       windowWidth: 1440,
-      logging: false
+      scrollY: 0
     }).then(function(canvas) {
-      var imgData = canvas.toDataURL('image/jpeg', 0.92);
-      var pdf = new window.jspdf.jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true
-      });
+      var imgData = canvas.toDataURL('image/jpeg', 0.95);
+      var iW = PW;
+      var iH = iW * (canvas.height / canvas.width);
+      var sliceY = 0;
 
-      var pageW = pdf.internal.pageSize.getWidth();
-      var pageH = pdf.internal.pageSize.getHeight();
-      var imgW = pageW;
-      var imgH = (canvas.height * pageW) / canvas.width;
-      var y = 0;
-
-      // Add pages for tall content
-      while (y < imgH) {
-        if (y > 0) pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, -y, imgW, imgH);
-        y += pageH;
+      while (sliceY < iH) {
+        if (!isFirst) pdf.addPage();
+        isFirst = false;
+        pdf.addImage(imgData, 'JPEG', 0, -sliceY, iW, iH, undefined, 'FAST');
+        sliceY += PH;
       }
 
-      // Footer on each page
-      var totalPages = pdf.internal.getNumberOfPages();
-      for (var p = 1; p <= totalPages; p++) {
-        pdf.setPage(p);
-        pdf.setFontSize(7);
-        pdf.setTextColor(120);
-        pdf.text('AXA Germany Intelligence Brief 2016–2018 · INCAE DBI S2 2026 · Josué Rodríguez Solís', pageW/2, pageH - 4, { align: 'center' });
-        pdf.text('Página ' + p + ' de ' + totalPages, pageW - 8, pageH - 4, { align: 'right' });
-      }
-
-      pdf.save('AXA-Intelligence-Brief-2016-2018.pdf');
+      idx++;
+      setTimeout(captureNext, 40);
     }).catch(function(err) {
-      console.error('PDF export error:', err);
-      alert('Error al generar el PDF. Intenta usando Ctrl+P / Cmd+P para imprimir.');
-    }).finally(function() {
-      // Restore everything
-      if (backTop) backTop.style.display = '';
-      if (subnav) subnav.style.visibility = '';
-      if (filterBar) filterBar.style.visibility = '';
-      if (agentBanner) agentBanner.style.visibility = '';
-      if (metaWasVisible && meta) { meta.style.display = 'block'; if(dash) dash.style.display = 'none'; }
-      window.scrollTo(0, scrollPos);
-      if (btn) { btn.innerHTML = '<span>⬇</span> Exportar PDF'; btn.disabled = false; }
+      console.error('[PDF] ' + t.label + ':', err);
+      idx++;
+      captureNext();
     });
-  }, 100);
+  }
+
+  // Wait 250 ms so all charts are fully painted before first capture
+  setTimeout(captureNext, 250);
 }
 
 // ── SCROLL EVENTS ──
