@@ -1480,32 +1480,241 @@ function switchTab(id) {
 }
 
 
-// ── EXPORT PDF — native browser print (vector text, perfect layout) ──
+// ── EXPORT PDF — clean document in new window ──
 function exportPDF() {
-  // Ensure dashboard tab is visible
-  var dash = document.getElementById('tab-dashboard');
-  var meta = document.getElementById('tab-metodo');
-  if (meta && meta.style.display !== 'none') {
-    showTab('dashboard');
-  }
-  // Close any open pivote detail panels before printing
-  document.querySelectorAll('.pivote-detail').forEach(function(d) { d.style.display = 'none'; });
-  document.querySelectorAll('.pivote-card').forEach(function(c) { c.classList.remove('selected'); });
-  window.scrollTo(0, 0);
-  setTimeout(function() { window.print(); }, 80);
+  var w = window.open('', '_blank');
+  if (!w) { alert('Permite ventanas emergentes para exportar el PDF.'); return; }
+  w.document.write(buildPrintHTML());
+  w.document.close();
+  w.focus();
 }
 
-// ── Update chart colors for print legibility ──
-window.addEventListener('beforeprint', function() {
-  Chart.defaults.color = '#444';
-  Chart.defaults.borderColor = '#ccc';
-  Object.keys(charts).forEach(function(id) { if (charts[id]) charts[id].update('none'); });
-});
-window.addEventListener('afterprint', function() {
-  Chart.defaults.color = '#7b82a0';
-  Chart.defaults.borderColor = '#242836';
-  Object.keys(charts).forEach(function(id) { if (charts[id]) charts[id].update('none'); });
-});
+function buildPrintHTML() {
+  var CSS = [
+    '@page{size:A4;margin:16mm 18mm}',
+    '*{box-sizing:border-box;margin:0;padding:0}',
+    'body{font-family:"IBM Plex Sans",Arial,sans-serif;font-size:10pt;color:#111;line-height:1.55;background:#fff}',
+    /* Cover */
+    '.cover{min-height:240mm;display:flex;flex-direction:column;justify-content:center;border-left:5px solid #8a6d30;padding:0 0 0 28px;page-break-after:always}',
+    '.cover-tag{font-size:8pt;letter-spacing:.18em;text-transform:uppercase;color:#888;margin-bottom:10px}',
+    '.cover-axa{color:#cf0a2c;font-weight:700}',
+    '.cover-h1{font-size:30pt;font-weight:700;line-height:1.05;margin:10px 0 8px}',
+    '.cover-sub{font-size:11pt;color:#555;max-width:480px;margin-bottom:36px}',
+    '.cover-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;border-top:1px solid #ddd;padding-top:24px;margin-bottom:36px}',
+    '.kv{font-size:22pt;font-weight:700;color:#8a6d30;font-family:monospace}',
+    '.kl{font-size:7pt;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-top:3px}',
+    '.cover-meta{font-size:7.5pt;color:#aaa;border-top:1px solid #eee;padding-top:10px;line-height:1.7}',
+    /* Sections */
+    '.sec{page-break-before:always;padding-top:4px}',
+    '.sec-hd{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;border-bottom:2px solid #111;padding-bottom:7px}',
+    '.sec-num{font-size:8pt;color:#bbb;letter-spacing:.12em;font-family:monospace}',
+    '.sec-title{font-size:15pt;font-weight:700}',
+    'h3{font-size:10pt;font-weight:700;margin:18px 0 8px;padding-bottom:5px;border-bottom:1px solid #e0e0e0}',
+    /* Tables */
+    'table{width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16px}',
+    'th{background:#111;color:#fff;padding:7px 9px;text-align:left;font-size:7.5pt;letter-spacing:.05em;font-weight:600}',
+    'td{padding:6px 9px;border-bottom:1px solid #eee;vertical-align:top}',
+    'tr:nth-child(even) td{background:#f8f8f8}',
+    '.n{font-family:monospace;text-align:right;font-weight:600}',
+    '.pos{color:#2e6e31}.neg{color:#8a2020}.gold{color:#8a6d30}.blu{color:#1565a0}',
+    /* Pivotes */
+    '.piv{margin-bottom:13px;padding:12px 14px;border:1px solid #eee;border-left:3px solid #8a6d30;page-break-inside:avoid}',
+    '.piv-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}',
+    '.piv-name{font-size:10.5pt;font-weight:700}',
+    '.piv-score{font-size:9pt;font-family:monospace;font-weight:700;color:#8a6d30}',
+    '.piv-ev{font-size:9pt;color:#444;margin-bottom:6px;line-height:1.5}',
+    '.piv-act{font-size:9pt;color:#333;background:#f5f5f5;padding:7px 10px;border-left:2px solid #1565a0;line-height:1.5}',
+    '.piv-act b{color:#1565a0}',
+    /* Recommendations */
+    '.recs{display:grid;grid-template-columns:1fr 1fr;gap:14px}',
+    '.rec{padding:12px 14px;border:1px solid #eee;page-break-inside:avoid}',
+    '.rec-pri{font-size:7.5pt;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:5px}',
+    '.p1{color:#8a2020}.p2{color:#8a6d30}.p3{color:#1565a0}',
+    '.rec-title{font-size:10.5pt;font-weight:700;margin-bottom:7px}',
+    '.rec-okr{font-size:8.5pt;background:#f5f5f5;padding:7px 9px;border-left:2px solid #8a6d30;margin-bottom:7px;line-height:1.6}',
+    '.rec-body{font-size:9pt;color:#444;line-height:1.55}',
+    /* Market */
+    '.mkt{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}',
+    '.mc{padding:11px 13px;border:1px solid #eee}',
+    '.ms{font-size:7pt;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:3px}',
+    '.mh{font-size:10pt;font-weight:700;margin-bottom:5px}',
+    '.mb{font-size:9pt;color:#555;line-height:1.5}',
+    /* Insights */
+    '.ins{display:flex;gap:11px;padding:11px 13px;border:1px solid #eee;margin-bottom:8px}',
+    '.ib{width:26px;height:26px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}',
+    '.ip{background:rgba(46,110,49,.1);color:#2e6e31}.iw{background:rgba(138,109,48,.1);color:#8a6d30}.ia{background:rgba(138,32,32,.1);color:#8a2020}',
+    '.it{font-weight:700;font-size:10pt;margin-bottom:3px}',
+    '.id{font-size:9pt;color:#555;line-height:1.5}',
+    '.badge{display:inline-block;font-size:7pt;padding:1px 5px;border:1px solid;border-radius:2px;margin-left:6px;vertical-align:middle}',
+    '.bp{color:#2e6e31;border-color:#2e6e31}.bw{color:#8a6d30;border-color:#8a6d30}.ba{color:#8a2020;border-color:#8a2020}',
+    /* Footer */
+    '.ft{margin-top:32px;border-top:1px solid #ddd;padding-top:10px;font-size:7.5pt;color:#888;line-height:1.7}'
+  ].join('\n');
+
+  var H = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">' +
+    '<title>AXA Germany · Intelligence Brief 2016–2018</title>' +
+    '<style>' + CSS + '</style></head><body>';
+
+  // ── COVER ──
+  H += '<div class="cover">';
+  H += '<div class="cover-tag"><span class="cover-axa">AXA</span> Germany &middot; Data Innovation Lab</div>';
+  H += '<div class="cover-h1">Intelligence Brief<br>2016 &ndash; 2018</div>';
+  H += '<div class="cover-sub">Análisis del portafolio de 11 smart data initiatives a través del marco de los seis pivotes de evolución digital y los mecanismos de control estratégico OKR / BSC.</div>';
+  H += '<div class="cover-kpis">';
+  H += '<div><div class="kv">€27.3M</div><div class="kl">Valor de negocio generado</div></div>';
+  H += '<div><div class="kv">776</div><div class="kl">Modelos analíticos deployados</div></div>';
+  H += '<div><div class="kv">+68%</div><div class="kl">Mejora calidad de datos</div></div>';
+  H += '<div><div class="kv">−54%</div><div class="kl">Reducción tiempo de acceso</div></div>';
+  H += '</div>';
+  H += '<div class="cover-meta">339 registros &middot; 2016–2018 &middot; 11 iniciativas &middot; 3 unidades (Data Analytics, Data Engineering, DMO)<br>';
+  H += 'Fuentes: AXAGermanyDataAccessUseData.csv &middot; Scheffler &amp; Wirths (2019) &middot; Barahona, INCAE 31448_S &amp; 31454_S &middot; Marcos de Control Estratégico<br>';
+  H += '<strong>INCAE Business School &middot; DBI S2 2026 &middot; Josué Rodríguez Solís</strong></div>';
+  H += '</div>';
+
+  // ── 01 KPIs ──
+  H += '<div class="sec"><div class="sec-hd"><span class="sec-num">01</span><span class="sec-title">Resumen Ejecutivo — KPIs Clave</span></div>';
+  H += '<table><thead><tr><th>Indicador</th><th>2016</th><th>2017</th><th>2018</th><th>Var. total</th><th>OKR objetivo</th></tr></thead><tbody>';
+  var rows1 = [
+    ['Calidad de datos (0–100)','43.7','59.3','73.6','+68%','pos','≥95'],
+    ['Tiempo acceso datos (días)','14.9','11.7','6.9','−54%','pos','Reducción continua'],
+    ['Satisfacción cliente (0–100)','60.8','70.7','80.7','+33%','pos','≥90'],
+    ['Brechas de datos (incidentes)','7','4','2','−71%','pos','0'],
+    ['Compliance training (%)','25.5%','44.5%','65.3%','+39.8 pp','pos','≥90%'],
+    ['Modelos analíticos (acum.)','59','252','465','+688%','pos','Crecimiento sostenido'],
+    ['Valor generado (€k acum.)','3 598','8 690','14 964','+316%','gold','Maximizar'],
+    ['% High Performance','8.6%','60.3%','100%','+91.4 pp','pos','100%'],
+    ['Ciclo de aprobación (días)','19.4','11.5','7.1','−63%','pos','≤5']
+  ];
+  rows1.forEach(function(r) {
+    H += '<tr><td>'+r[0]+'</td><td class="n">'+r[1]+'</td><td class="n">'+r[2]+'</td><td class="n">'+r[3]+'</td>';
+    H += '<td class="n '+r[5]+'">'+r[4]+'</td><td>'+r[6]+'</td></tr>';
+  });
+  H += '</tbody></table>';
+  H += '<h3>Portafolio — Valor e High Performance por iniciativa</h3>';
+  H += '<table><thead><tr><th>Iniciativa</th><th>% High Performance</th><th>Valor total (€k)</th><th>Calidad promedio</th></tr></thead><tbody>';
+  var inits = [
+    ['Customer dialog system','83%','pos','1 843','67.7'],
+    ['Chronic disease prevention','78%','pos','660','70.8'],
+    ['GDPR compliance lifecycle','73%','pos','1 055','67.7'],
+    ['Customer segmentation','67%','','1 864','66.6'],
+    ['Claims automation','64%','','4 930','55.3'],
+    ['Cross-selling / Retención','63%','','2 615','59.3'],
+    ['Fraud detection','58%','','5 138','57.2'],
+    ['Dynamic pricing','56%','','4 951','57.8'],
+    ['Flood risk modeling','50%','neg','1 300','48.4 ⚠'],
+    ['Geospatial claims','44%','neg','1 773','56.3'],
+    ['Data lake infrastructure','42%','neg','1 122','59.6']
+  ];
+  inits.forEach(function(r) {
+    H += '<tr><td>'+r[0]+'</td><td class="n '+r[2]+'">'+r[1]+'</td><td class="n">'+r[3]+'</td><td class="n">'+r[4]+'</td></tr>';
+  });
+  H += '</tbody></table></div>';
+
+  // ── 02 PIVOTES ──
+  H += '<div class="sec"><div class="sec-hd"><span class="sec-num">02</span><span class="sec-title">Seis Pivotes de Evolución Digital — Madurez 2018</span></div>';
+  var pivs = [
+    ['01 · Alineamiento Dinámico','78 / 100','#8a6d30','#8a6d30',
+     '100% de iniciativas en High Performance al cierre de 2018 (vs 8.6% en 2016). El Data Innovation Lab alineó explícitamente el portafolio con Ambition 2020: ventas digitales, reducción del tiempo de comercialización e innovación tecnológica.',
+     'Institucionalizar el smart data portfolio review trimestral ante el Consejo mediante el framework OKR del 31454_S.'],
+    ['02 · Cultura y Liderazgo Digital','65 / 100','#1565a0','#1565a0',
+     'Compliance training: 25.5% → 44.5% → 65.3% (+20 pp/año). Con AI Act vigente, el 34.7% sin formación es riesgo regulatorio activo (multas hasta €35M). La tensión Data Analytics vs DMO es la fricción cultural más documentada.',
+     'Programa de formación modular en 6 semanas diferenciado por rol (executives, data owners, analistas). Meta: cerrar la brecha del 34.7% antes del próximo ciclo de auditoría GDPR/AI Act.'],
+    ['03 · Innovación Centrada en Cliente','81 / 100','#2e6e31','#2e6e31',
+     'CSAT: 60.8 → 70.7 → 80.7 (+33% total). customer_dialog_system: 83% High Performance, calidad 67.7. Dynamic pricing generó €4.95M con productos personalizados al perfil real del asegurado. Benchmark sectorial 2025: 76 — ventaja de 4.7 puntos que se erosiona.',
+     'Escalar customer_dialog_system con capacidades genAI sobre el data lake existente. Mayor % High (83%) + infraestructura disponible = mayor ROI inmediato del portafolio.'],
+    ['04 · Agilidad Operativa','72 / 100','#8a6d30','#8a6d30',
+     'Ciclo de aprobación: 19.4 → 11.5 → 7.1 días (−63%). Tiempo de acceso: 14.9 → 6.9 días (−54%). El data lake y el compliance & risk working group semanal fueron los habilitadores clave.',
+     'Implementar SAFe (Scaled Agile Framework) para extender la agilidad del Data Innovation Lab al resto de la organización antes de que el portafolio de IA escale.'],
+    ['05 · Acceso y Uso de Datos ★','86 / 100 (Pivote estrella)','#1565a0','#1565a0',
+     'Calidad: 43.7 → 73.6 (+68%). Ratio gather/analysis: 78%/22% → 62%/38% (+16 pp en análisis). 45+ fuentes conectadas al data lake. Con AI Act, la calidad al 95%+ es el umbral para documentar y auditar modelos de alto riesgo. AXA está a 21 pp de ese umbral.',
+     'Alcanzar calidad ≥95% en todos los sistemas críticos en 18 meses. P&C debe ser la prioridad por volumen y exposición a brechas.'],
+    ['06 · Ecosistemas Colaborativos ⚠','58 / 100 (Mayor brecha)','#8a2020','#8a2020',
+     'Equipos cross-funcionales: 1.2 → 1.8 miembros (bajo). flood_risk_modeling: calidad 48.4 (mínimo del portafolio), correlacionado con escasa integración de datos externos. El modelo Arçelik-Simularge generó +$2M anuales con un solo partnership bien ejecutado.',
+     'Programa de InsurTech partnerships en 3 verticales: datos de movilidad (auto), wearables (health), geoespaciales/climáticos (flood y property).']
+  ];
+  pivs.forEach(function(p) {
+    H += '<div class="piv" style="border-left-color:'+p[2]+'">';
+    H += '<div class="piv-hd"><span class="piv-name">'+p[0]+'</span><span class="piv-score" style="color:'+p[3]+'">'+p[1]+'</span></div>';
+    H += '<p class="piv-ev">'+p[4]+'</p>';
+    H += '<div class="piv-act"><b>Acción recomendada:</b> '+p[5]+'</div></div>';
+  });
+  H += '</div>';
+
+  // ── 03 MARKET ──
+  H += '<div class="sec"><div class="sec-hd"><span class="sec-num">03</span><span class="sec-title">Condiciones del Mercado · 2025–2026</span></div>';
+  H += '<div class="mkt">';
+  var mkt = [
+    ['Regulación · Europa 2025','AI Act: nueva capa de compliance para aseguradoras','Fraud detection y scoring clasificados como "alto riesgo". Requieren documentación de entrenamiento, explicabilidad y supervisión humana. Multas: hasta €35M o 7% del revenue global. Organizaciones con gobernanza madura tienen ventaja estructural.'],
+    ['Tecnología · GenAI 2025','GenAI comprime en horas lo que AXA tardó 3 años','Agentes analíticos con LLMs replican el loop gather→analyze en horas. El activo diferenciador real no es el modelo — es la infraestructura que lo alimenta y la gobernanza que garantiza su calidad.'],
+    ['Competencia · Alemania 2025','Allianz y Munich Re aceleran plataformas en tiempo real','Competidores directos invierten en data platforms centralizadas. La ventaja del Data Innovation Lab (fundado 2016) da a AXA 2–3 años de adelanto, pero ese margen se erosiona con el ecosistema InsurTech.'],
+    ['Cliente · Expectativas 2026','Data gap como diferenciador competitivo','CSAT AXA 80.7 (2018) vs benchmark sectorial 76 (2025). El cliente espera que la aseguradora lo conozca en tiempo real. Datos de wearables, movilidad y comportamiento son el próximo frente estratégico.']
+  ];
+  mkt.forEach(function(m) {
+    H += '<div class="mc"><div class="ms">'+m[0]+'</div><div class="mh">'+m[1]+'</div><div class="mb">'+m[2]+'</div></div>';
+  });
+  H += '</div>';
+  H += '<div class="ins"><div class="ib ip">✓</div><div><div class="it">Fortaleza: Infraestructura como ventaja duradera <span class="badge bp">Oportunidad</span></div><div class="id">El data lake con 45+ fuentes y el framework DMO representan un activo que no se replica rápido. La calidad del 73.6% en 2018 es base sólida para adoptar genAI responsablemente — algo que organizaciones sin esta base no pueden hacer con el mismo nivel de confianza regulatoria.</div></div></div>';
+  H += '<div class="ins"><div class="ib iw">△</div><div><div class="it">Advertencia: Compliance al 65.3% — brechas ante AI Act <span class="badge bw">Atención</span></div><div class="id">Con el AI Act en vigor, el 34.7% sin formación es riesgo regulatorio activo. Multas potenciales: hasta €35M o 7% del revenue global para violaciones de sistemas de alto riesgo.</div></div></div>';
+  H += '<div class="ins"><div class="ib ia">!</div><div><div class="it">Riesgo: Ecosistemas colaborativos subdesarrollados <span class="badge ba">Riesgo crítico</span></div><div class="id">Con madurez de 58/100, AXA corre el riesgo de quedar fuera de los ecosistemas InsurTech. El modelo Arçelik-Simularge ilustra cómo un solo partnership bien ejecutado generó +$2M anuales. AXA tiene la infraestructura — falta la estrategia de alianzas.</div></div></div>';
+  H += '</div>';
+
+  // ── 04 RECOMMENDATIONS ──
+  H += '<div class="sec"><div class="sec-hd"><span class="sec-num">04</span><span class="sec-title">Recomendaciones Estratégicas con OKRs</span></div><div class="recs">';
+  var recs = [
+    ['p1','&bull; Prioridad 1 — Acción inmediata',
+     'Cerrar la brecha de compliance: 65.3% → 95% en 6 meses',
+     'OKR: 95% de personal con formación GDPR/AI Act en 6 meses<br>KPI: Tasa mensual de finalización &middot; Auditorías trimestrales &middot; Cero brechas en Q3–Q4',
+     'El AI Act categoriza fraud detection y scoring de seguros como "alto riesgo". El 34.7% sin formación no puede supervisar modelos de IA responsablemente. Multas hasta €35M. El ritmo actual (20 pp/año) no alcanza.'],
+    ['p1','&bull; Prioridad 1 — Acción inmediata',
+     'Escalar customer dialog system con genAI sobre el data lake existente',
+     'OKR: Resolución autónoma de consultas al 60% en 12 meses<br>KPI: CSAT ≥88 &middot; NPS +20% &middot; Tiempo resolución −30%',
+     'Mayor % High (83%) y segunda en calidad (67.7). El data lake tiene los contratos estructurados. Integrar un LLM sobre esta base existente es la inversión de menor costo y mayor ROI inmediato del portafolio.'],
+    ['p2','&#9680; Prioridad 2 — Próximos 6 meses',
+     'Activar ecosistemas colaborativos: 3 InsurTech partnerships en 12 meses',
+     'OKR: 3 partnerships estratégicos de datos firmados en 12 meses<br>KPI: Fuentes externas integradas &middot; ROI por partnership &middot; Nuevos modelos habilitados',
+     'Pivote más débil (58/100) con mayor upside. flood_risk_modeling tiene la calidad más baja (48.4) por escasez de datos externos. Verticales: movilidad (auto), wearables (health), geoespañciales/climáticos (flood).'],
+    ['p2','&#9680; Prioridad 2 — Próximos 6 meses',
+     'Reporting mensual de los 6 pivotes al Consejo de Directores',
+     'OKR: Dashboard de pivotes operativo para el Consejo en Q1 2026<br>KPI: % pivotes con OKRs activos &middot; Velocidad de decisión estratégica',
+     'El marco de Barahona es claro: el Consejo debe evolucionar de revisiones anuales a monitoreo mensual con OKRs. El dataset de AXA ya tiene los KPIs necesarios. El apoyo de top management fue el factor crítico de éxito del caso.'],
+    ['p3','&#9675; Prioridad 3 — Horizonte 12–18 meses',
+     'Llevar calidad de datos al 95%: el umbral del BI prescriptivo',
+     'OKR: Calidad ≥90% en todos los sistemas críticos en 18 meses<br>KPI: Score por línea de negocio &middot; Duplicados &lt;5% &middot; Metadatos ≥95%',
+     'La diferencia entre BI diagnóstico y BI prescriptivo es la calidad y completitud del dato. P&C debe ser la prioridad por volumen y exposición a brechas. AXA está a 21 pp del umbral del AI Act.'],
+    ['p3','&#9675; Prioridad 3 — Horizonte 12–18 meses',
+     'Expandir dynamic pricing con datos telemáticos y comportamentales',
+     'OKR: Ventas digitales al 40% del total en 24 meses<br>KPI: Crecimiento YoY ingresos digitales &middot; Precision pricing &middot; NPS por segmento',
+     'Dynamic_pricing generó €4.95M con calidad de 57.8% — hay margen de mejora. Datos de wearables y telemática mueven AXA de "pricing histórico" a "pricing por comportamiento en tiempo real" — el paradigma global en 2025–2026.']
+  ];
+  recs.forEach(function(r) {
+    H += '<div class="rec"><div class="rec-pri '+r[0]+'">'+r[1]+'</div>';
+    H += '<div class="rec-title">'+r[2]+'</div>';
+    H += '<div class="rec-okr">'+r[3]+'</div>';
+    H += '<div class="rec-body">'+r[4]+'</div></div>';
+  });
+  H += '</div></div>';
+
+  // ── SOURCES ──
+  H += '<div class="sec"><div class="sec-hd"><span class="sec-num">Fuentes</span><span class="sec-title">Trazabilidad</span></div>';
+  H += '<table><thead><tr><th>Afirmación del brief</th><th>Fuente</th><th>Cálculo</th></tr></thead><tbody>';
+  var srcs = [
+    ['Calidad: 43.7 → 73.6 (+68%)','data_quality_score &middot; grouped by year','mean() por año &middot; Python pandas'],
+    ['Tiempo acceso: 14.9 → 6.9 (−54%)','time_to_data_access_days','(14.9−6.9)/14.9 = 53.7%'],
+    ['Ratio gather/analysis: 78/22 → 62/38','hours_gathering + hours_analysis','gathering/(gathering+analysis) por año'],
+    ['customer_dialog_system: 83% High','initiative_performance_tier','count(tier=High)/count(*)'],
+    ['Valor total: €27.3M (2016–2018)','business_value_generated_euros_thousands','3 598 + 8 690 + 14 964 = 27 252k'],
+    ['Score Pivote 5: 86/100','31454_S &middot; Tabla 5 + dataset','Calidad +68%, acceso −54%, ratio +16 pp, brechas −71%'],
+    ['Score Pivote 6: 58/100','31454_S &middot; Tabla 6 + cross_functional_team_size','Equipos: 1.2→1.8 (bajo); fuentes externas limitadas'],
+    ['Arçelik-Simularge: +$2M anuales','31454_S &middot; Recuadro 6','"reducción de desperdicios... ahorro inicial de más de $2 millones anuales"']
+  ];
+  srcs.forEach(function(s) { H += '<tr><td>'+s[0]+'</td><td>'+s[1]+'</td><td>'+s[2]+'</td></tr>'; });
+  H += '</tbody></table>';
+  H += '<div class="ft">AXAGermanyDataAccessUseData.csv (339 registros, 2016–2018) &middot; Scheffler &amp; Wirths (2019), "Data Innovation @ AXA Germany" &middot; Barahona (2024), 31448_S Acceso y uso de datos &middot; Barahona (2024), 31454_S Gobierno corporativo e IA generativa &middot; Barahona, Marcos de Control Estratégico (OKR/BSC) &middot; INCAE DBI S2, 2026<br><strong>INCAE Business School &middot; Digital Business Intelligence: gobernanza práctica con herramientas y dashboards &middot; S2 2026 &middot; Josué Rodríguez Solís</strong></div></div>';
+
+  H += '<script>window.onload=function(){window.print();}<\/script>';
+  H += '</body></html>';
+  return H;
+}
 
 // ── SCROLL EVENTS ──
 window.addEventListener('scroll', function() {
