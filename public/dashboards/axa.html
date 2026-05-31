@@ -7,8 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 :root {
   --bg:#0a0c10; --surface:#111318; --surface2:#181c24;
@@ -452,47 +450,106 @@ button.nav-pill.active {
 
 /* ── PRINT STYLES ── */
 @media print {
-  /* Hide interactive chrome */
-  .masthead, .sub-nav, .filter-bar, .back-to-top,
-  .export-btn, .agent-banner, .nav-pill,
-  #tab-metodo { display: none !important; }
+  @page { size: A4 landscape; margin: 10mm 16mm 12mm; }
 
-  /* Show dashboard only */
-  #tab-dashboard { display: block !important; }
-
-  body { background: #fff !important; color: #111 !important; font-size: 11px; }
-
-  :root {
-    --bg: #fff; --surface: #f8f8f8; --surface2: #f0f0f0;
-    --border: #ddd; --border-bright: #ccc;
-    --text: #111; --text-muted: #444; --text-dim: #888;
-    --accent: #8a6d30; --accent2: #1a6a8a; --accent3: #2d6e31; --accent4: #8a2020;
-  }
-
-  section { page-break-inside: avoid; padding: 24px 0; }
-  .kpi-grid { grid-template-columns: repeat(4,1fr); }
-  .chart-grid-2, .radar-wrap { grid-template-columns: 1fr 1fr; }
-  .chart-grid-3 { grid-template-columns: repeat(3,1fr); }
-  .pivotes-grid { grid-template-columns: repeat(3,1fr); }
-  .recs-grid { grid-template-columns: 1fr 1fr; }
+  /* ── Hide all chrome ── */
+  .masthead, .sub-nav, .filter-bar, .back-to-top, .export-btn,
+  .agent-banner, .nav-pill, #tab-metodo,
+  body::before, .hero::after, .score-tooltip-box,
   .pivote-detail { display: none !important; }
 
-  .hero { padding: 24px 0 16px; }
-  .hero-headline { font-size: 28px; }
-  .page { padding: 0 24px; max-width: 100%; }
+  /* ── Show dashboard ── */
+  #tab-dashboard { display: block !important; }
 
-  canvas { max-height: 180px !important; }
+  /* ── Light theme + preserve colors ── */
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    font-size: 11px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  :root {
+    --bg: #fff; --surface: #fafafa; --surface2: #f2f2f2;
+    --border: #ddd; --border-bright: #ccc;
+    --text: #111; --text-muted: #444; --text-dim: #888;
+    --accent: #8a6d30; --accent2: #1565a0; --accent3: #2e6e31; --accent4: #8a2020;
+    --axa-red: #cf0a2c;
+  }
 
-  /* Print header */
+  /* ── Hero ── */
+  .hero { padding: 16px 0 20px; border-bottom: 2px solid #111; }
+  .hero-headline { font-size: 26px; }
+  .hero-stat-val { color: var(--accent); }
+  .hero-sub { color: #555; }
+  .hero-stat-lbl { color: #888; }
+
+  /* ── Layout ── */
+  .page { padding: 0; max-width: 100%; }
+  section {
+    padding: 16px 0;
+    border-bottom: 1px solid #ddd;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* One section per page */
+  #executive   { page-break-before: always; break-before: page; }
+  #evolution   { page-break-before: always; break-before: page; }
+  #pivotes     { page-break-before: always; break-before: page; }
+  #initiatives { page-break-before: always; break-before: page; }
+  #market      { page-break-before: always; break-before: page; }
+  #recs        { page-break-before: always; break-before: page; }
+
+  .section-header { margin-bottom: 14px; }
+
+  /* ── KPI Cards ── */
+  .kpi-grid { grid-template-columns: repeat(4,1fr); }
+  .kpi-card { padding: 14px; }
+  .kpi-value { font-size: 26px; }
+
+  /* ── Charts ── */
+  .chart-grid-2, .radar-wrap { grid-template-columns: 1fr 1fr; margin-bottom: 10px; }
+  .chart-grid-3 { grid-template-columns: repeat(3,1fr); margin-bottom: 10px; }
+  .chart-panel { padding: 14px; }
+  .chart-canvas-wrap { height: 170px; }
+  canvas { max-height: 170px !important; }
+  .chart-full { padding: 14px; margin-bottom: 10px; }
+
+  /* ── Timeline ── */
+  .timeline { grid-template-columns: repeat(3,1fr); }
+
+  /* ── Pivotes ── */
+  .pivotes-grid { grid-template-columns: repeat(3,1fr); margin-bottom: 10px; }
+  .pivote-card { padding: 14px; }
+  .pivote-num { opacity: .15; }
+
+  /* ── Initiatives ── */
+  .initiative-grid { grid-template-columns: 1fr 1fr; }
+
+  /* ── Market ── */
+  .market-grid { grid-template-columns: repeat(4,1fr); margin-bottom: 10px; }
+  .market-card { padding: 16px; }
+
+  /* ── Recommendations ── */
+  .recs-grid { grid-template-columns: 1fr 1fr; }
+  .rec-card { padding: 14px; }
+
+  /* ── Footer ── */
+  footer { padding: 10px 0; }
+
+  /* ── Print header ── */
   .print-header {
     display: block !important;
     text-align: center;
-    padding: 12px 0;
-    border-bottom: 2px solid #111;
-    margin-bottom: 24px;
-    font-size: 10px;
-    color: #666;
-    font-family: monospace;
+    padding: 6px 0;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 0;
+    font-size: 8px;
+    color: #888;
+    font-family: var(--font-mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
   }
 }
 
@@ -1423,126 +1480,32 @@ function switchTab(id) {
 }
 
 
-// ── EXPORT PDF (exact-fit pages · 297mm wide · scale 2) ──
+// ── EXPORT PDF — native browser print (vector text, perfect layout) ──
 function exportPDF() {
-  var btn      = document.querySelector('.export-btn');
-  var subnav   = document.getElementById('dash-subnav');
-  var filterB  = document.querySelector('.filter-bar');
-  var agBanner = document.querySelector('.agent-banner');
-  var backTop  = document.getElementById('backToTop');
-  var dash     = document.getElementById('tab-dashboard');
-  var meta     = document.getElementById('tab-metodo');
-
-  var scrollPos      = window.scrollY;
-  var metaWasVisible = meta && meta.style.display !== 'none';
-
-  function restore() {
-    [subnav, filterB, agBanner, backTop].forEach(function(el) { if (el) el.style.visibility = ''; });
-    if (btn) btn.style.visibility = '';
-    document.querySelectorAll('.fade-up').forEach(function(el) {
-      el.style.animation = ''; el.style.opacity = ''; el.style.transform = '';
-    });
-    document.querySelectorAll('.pivote-detail').forEach(function(d) { d.style.display = ''; });
-    if (metaWasVisible && meta) { meta.style.display = 'block'; if (dash) dash.style.display = 'none'; }
-    window.scrollTo(0, scrollPos);
-    if (btn) { btn.innerHTML = '<span>⬇</span> Exportar PDF'; btn.disabled = false; }
+  // Ensure dashboard tab is visible
+  var dash = document.getElementById('tab-dashboard');
+  var meta = document.getElementById('tab-metodo');
+  if (meta && meta.style.display !== 'none') {
+    showTab('dashboard');
   }
-
-  // ── Prepare DOM ──
-  if (btn) { btn.innerHTML = '<span>⏳</span> Preparando…'; btn.disabled = true; }
-  if (meta) meta.style.display = 'none';
-  if (dash) dash.style.display = 'block';
-  [subnav, filterB, agBanner, backTop].forEach(function(el) { if (el) el.style.visibility = 'hidden'; });
-  if (btn) btn.style.visibility = 'hidden';
-  // Force .fade-up to final state — animations may not have finished yet
-  document.querySelectorAll('.fade-up').forEach(function(el) {
-    el.style.animation = 'none'; el.style.opacity = '1'; el.style.transform = 'translateY(0)';
-  });
-  // Close any open pivote detail panels
+  // Close any open pivote detail panels before printing
   document.querySelectorAll('.pivote-detail').forEach(function(d) { d.style.display = 'none'; });
   document.querySelectorAll('.pivote-card').forEach(function(c) { c.classList.remove('selected'); });
   window.scrollTo(0, 0);
-
-  var PW = 297; // fixed page width in mm; height varies per section
-
-  var TARGETS = [
-    { el: document.querySelector('.hero'),        label: 'Portada'              },
-    { el: document.getElementById('executive'),   label: '01 · Ejecutivo'       },
-    { el: document.getElementById('evolution'),   label: '02 · Evolución'       },
-    { el: document.getElementById('pivotes'),     label: '03 · Seis Pivotes'    },
-    { el: document.getElementById('initiatives'), label: '04 · Iniciativas'     },
-    { el: document.getElementById('market'),      label: '05 · Mercado'         },
-    { el: document.getElementById('recs'),        label: '06 · Recomendaciones' },
-  ].filter(function(t) { return !!t.el; });
-
-  // Phase 1: capture all sections sequentially
-  var captured = [];
-  var idx = 0;
-
-  function captureNext() {
-    if (idx >= TARGETS.length) { assemblePDF(); return; }
-
-    var t = TARGETS[idx];
-    if (btn) btn.innerHTML = '<span>⏳</span> Capturando ' + t.label + ' · ' + (idx + 1) + ' / ' + TARGETS.length;
-
-    html2canvas(t.el, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#0a0c10',
-      logging: false,
-      windowWidth: 1440,
-      scrollY: 0
-    }).then(function(canvas) {
-      captured.push({
-        data:  canvas.toDataURL('image/jpeg', 0.95),
-        iH:    PW * (canvas.height / canvas.width),
-        label: t.label
-      });
-      idx++;
-      setTimeout(captureNext, 40);
-    }).catch(function(err) {
-      console.error('[PDF] ' + t.label + ':', err);
-      idx++;
-      captureNext();
-    });
-  }
-
-  // Phase 2: assemble PDF with exact-fit page heights — no overflow, no blank space
-  function assemblePDF() {
-    if (btn) btn.innerHTML = '<span>⏳</span> Ensamblando…';
-
-    // First page uses the hero dimensions
-    var pdf = new window.jspdf.jsPDF({ unit: 'mm', format: [PW, captured[0].iH], compress: true });
-    pdf.addImage(captured[0].data, 'JPEG', 0, 0, PW, captured[0].iH, undefined, 'FAST');
-
-    for (var i = 1; i < captured.length; i++) {
-      pdf.addPage([PW, captured[i].iH]);
-      pdf.addImage(captured[i].data, 'JPEG', 0, 0, PW, captured[i].iH, undefined, 'FAST');
-    }
-
-    // Footer on every page — placed after all pages exist so total is known
-    var total = pdf.internal.getNumberOfPages();
-    for (var p = 1; p <= total; p++) {
-      pdf.setPage(p);
-      var ph = captured[p - 1].iH;
-      pdf.setFontSize(7);
-      pdf.setTextColor(110, 110, 110);
-      pdf.text(
-        'AXA Germany · Intelligence Brief 2016–2018 · INCAE DBI S2 2026 · Josué Rodríguez Solís',
-        PW / 2, ph - 3, { align: 'center' }
-      );
-      pdf.text(captured[p - 1].label, 8, ph - 3);
-      pdf.text('Página ' + p + ' / ' + total, PW - 8, ph - 3, { align: 'right' });
-    }
-
-    pdf.save('AXA-Intelligence-Brief-2016-2018.pdf');
-    restore();
-  }
-
-  // 350 ms — enough for chart.js animations (longest is 350ms default) to complete
-  setTimeout(captureNext, 350);
+  setTimeout(function() { window.print(); }, 80);
 }
+
+// ── Update chart colors for print legibility ──
+window.addEventListener('beforeprint', function() {
+  Chart.defaults.color = '#444';
+  Chart.defaults.borderColor = '#ccc';
+  Object.keys(charts).forEach(function(id) { if (charts[id]) charts[id].update('none'); });
+});
+window.addEventListener('afterprint', function() {
+  Chart.defaults.color = '#7b82a0';
+  Chart.defaults.borderColor = '#242836';
+  Object.keys(charts).forEach(function(id) { if (charts[id]) charts[id].update('none'); });
+});
 
 // ── SCROLL EVENTS ──
 window.addEventListener('scroll', function() {
@@ -1565,8 +1528,8 @@ window.addEventListener('scroll', function() {
 
 
 <div class="print-header">AXA Germany · Data Innovation Lab Intelligence Brief 2016–2018 · INCAE Business School DBI S2 2026 · Josué Rodríguez Solís</div>
-<button class="export-btn" onclick="exportPDF()" title="Exportar como PDF">
-  <span>⬇</span> Exportar PDF
+<button class="export-btn" onclick="exportPDF()" title="Imprimir / Guardar como PDF">
+  <span>⎙</span> Imprimir / PDF
 </button>
 <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Volver al inicio">↑</button>
 </body>
