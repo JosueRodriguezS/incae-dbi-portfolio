@@ -240,10 +240,26 @@
 }
 
 @media (max-width: 768px) {
-  .projects-grid { grid-template-columns: 1fr; }
+  /* Horizontal scroll strip — cards keep original size, user swipes */
+  .projects-grid {
+    grid-template-columns: repeat(6, min(80vw, 290px));
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* Extend to screen edges so first card aligns with page content */
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .projects-grid::-webkit-scrollbar { display: none; }
 
-  /* On mobile, cards stack vertically — restore full border-radius */
-  .project-card { border-radius: var(--radius); }
+  /* Each card snaps into position on swipe */
+  .project-card {
+    scroll-snap-align: start;
+    border-radius: var(--radius);
+  }
   .project-card--active { border-bottom-color: var(--accent); }
   .project-card__connector { display: none; }
 
