@@ -234,6 +234,13 @@
   display: block;
 }
 
+/* ─── CONTENT SCROLLER (universal wrapper) ───────────────────── */
+/* Desktop: transparent passthrough */
+.dashboard-content-scroller { width: 100%; }
+
+/* Fullscreen button — desktop: hidden; mobile: shown via media query */
+.dashboard-fullscreen-btn { display: none; }
+
 /* ─── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .projects-grid { grid-template-columns: 1fr 1fr; }
@@ -286,18 +293,39 @@
     flex-shrink: 0;
   }
 
-  /* Dashboard body: 2D scroll zone — user pans the desktop-sized dashboard */
+  /* 2D scroll zone — user pans the desktop-sized dashboard */
   .dashboard-panel__body {
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain; /* prevent page scroll bleed */
+    overscroll-behavior: contain;
     max-height: 82vh;
   }
 
-  /* Keep the iframe at desktop width — let the user explore by panning */
-  .dashboard-iframe-wrapper { width: 1100px; }
-  .dashboard-iframe {
-    width: 1100px;
-    height: min(700px, 80vh);
+  /* Universal scroller: forces desktop width for ALL dashboards (iframes + React components) */
+  .dashboard-content-scroller { min-width: 1100px; }
+
+  /* Iframe height adapts to viewport; width comes from scroller (100% of 1100px) */
+  .dashboard-iframe { height: min(700px, 80vh); }
+
+  /* Fullscreen button — prominent strip at top of panel body */
+  .dashboard-fullscreen-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0 1rem;
+    background: rgba(56, 189, 248, 0.06);
+    border-bottom: 1px solid var(--border);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
+  .dashboard-fullscreen-btn:hover { background: rgba(56, 189, 248, 0.12); }
 }

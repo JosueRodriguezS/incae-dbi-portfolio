@@ -17,6 +17,7 @@ const PROJECTS = [
       'Análisis de cómo Huawei sostuvo su ventaja competitiva global mediante la alineación de capacidades de sensing, seizing y reconfiguration con su estrategia de innovación y gobernanza corporativa.',
     tags: ['Capacidades Dinámicas', 'Estrategia', 'Gobernanza', 'Chart.js'],
     component: HuaweiDashboard,
+    mobileUrl: 'dashboards/huawei.html',
   },
   {
     id: 'fcc',
@@ -27,6 +28,7 @@ const PROJECTS = [
       'Dashboard de análisis de la transformación digital de FCC a lo largo de 11 trimestres (2013–2016), midiendo cultura organizacional, adopción de prácticas ágiles y compromiso ejecutivo por fase de modernización.',
     tags: ['Transformación Digital', 'Analytics', 'React', 'Recharts'],
     component: FCCDashboard,
+    mobileUrl: null,
   },
   {
     id: 'raps',
@@ -37,6 +39,7 @@ const PROJECTS = [
       'Dashboard analítico del caso RAPS, explorando métricas de desempeño operativo y su relación con decisiones de gobernanza de datos en contextos de alta complejidad empresarial.',
     tags: ['Operaciones', 'BI', 'React', 'Recharts', 'Lucide'],
     component: RAPSDashboard,
+    mobileUrl: null,
   },
   {
     id: 'dbvertrieb',
@@ -47,6 +50,7 @@ const PROJECTS = [
       'Dashboard longitudinal (2005–2018, 948 observaciones) del journey de transformación digital de Deutsche Bahn Vertrieb. OKR framework de agilidad operativa, análisis por fase de IT (bimodal separado → reintegrado), y chatbot analítico con contexto del caso.',
     tags: ['Agilidad Operativa', 'Bimodal IT', 'SAFe', 'OKR', 'AI Analyst', 'Recharts'],
     component: DBVertriebDashboard,
+    mobileUrl: 'https://vertrieb-pulse.lovable.app',
   },
   {
     id: 'axa',
@@ -57,6 +61,7 @@ const PROJECTS = [
       'Dashboard agéntico de AXA Germany: 339 registros operativos del Data Innovation Lab analizados a través del marco de los seis pivotes de evolución digital y OKR/BSC. Incluye filtros interactivos por año y unidad, análisis de madurez por pivote, condiciones de mercado 2025–2026 y trazabilidad completa del flujo de trabajo agéntico.',
     tags: ['Agentes de IA', 'Intelligence Brief', 'OKR / BSC', '6 Pivotes', 'Chart.js', 'HTML Autónomo'],
     component: AXADashboard,
+    mobileUrl: 'dashboards/axa.html',
   },
   {
     id: 'arcelik',
@@ -67,6 +72,7 @@ const PROJECTS = [
       'Dashboard interactivo del ecosistema digital de Arçelik: modelo de twin ecosystem que integra cadena de valor, alianzas estratégicas y capacidades de innovación para acelerar la transformación hacia productos y servicios conectados.',
     tags: ['Twin Ecosystem', 'Innovación Digital', 'Ecosistema', 'Lovable', 'IA Generativa'],
     component: ArcelikDashboard,
+    mobileUrl: 'https://areliktwinecosystem.lovable.app',
   },
 ]
 
@@ -140,6 +146,12 @@ export default function Projects() {
       {/* Dashboard panel — slides in below the card grid */}
       {active && activeProject && (() => {
         const ActiveDashboard = activeProject.component
+        const mobileUrl = activeProject.mobileUrl
+          ? activeProject.mobileUrl.startsWith('http')
+            ? activeProject.mobileUrl
+            : `${import.meta.env.BASE_URL}${activeProject.mobileUrl}`
+          : null
+
         return (
           <div
             ref={panelRef}
@@ -176,9 +188,21 @@ export default function Projects() {
               </div>
             </div>
             <div className="dashboard-panel__body">
-              <Suspense fallback={<div className="dashboard-loading">Cargando dashboard…</div>}>
-                <ActiveDashboard />
-              </Suspense>
+              {mobileUrl && (
+                <a
+                  href={mobileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="dashboard-fullscreen-btn"
+                >
+                  ↗ Abrir en pantalla completa
+                </a>
+              )}
+              <div className="dashboard-content-scroller">
+                <Suspense fallback={<div className="dashboard-loading">Cargando dashboard…</div>}>
+                  <ActiveDashboard />
+                </Suspense>
+              </div>
             </div>
           </div>
         )
