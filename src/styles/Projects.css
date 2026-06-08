@@ -240,26 +240,10 @@
 }
 
 @media (max-width: 768px) {
-  /* Horizontal scroll strip — cards keep original size, user swipes */
-  .projects-grid {
-    grid-template-columns: repeat(6, min(80vw, 290px));
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    /* Extend to screen edges so first card aligns with page content */
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-  .projects-grid::-webkit-scrollbar { display: none; }
+  .projects-grid { grid-template-columns: 1fr; }
 
-  /* Each card snaps into position on swipe */
-  .project-card {
-    scroll-snap-align: start;
-    border-radius: var(--radius);
-  }
+  /* On mobile, cards stack vertically — restore full border-radius */
+  .project-card { border-radius: var(--radius); }
   .project-card--active { border-bottom-color: var(--accent); }
   .project-card__connector { display: none; }
 
@@ -302,6 +286,18 @@
     flex-shrink: 0;
   }
 
-  /* Iframe fits the viewport height on mobile */
-  .dashboard-iframe { height: min(600px, 80vh); }
+  /* Dashboard body: 2D scroll zone — user pans the desktop-sized dashboard */
+  .dashboard-panel__body {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain; /* prevent page scroll bleed */
+    max-height: 82vh;
+  }
+
+  /* Keep the iframe at desktop width — let the user explore by panning */
+  .dashboard-iframe-wrapper { width: 1100px; }
+  .dashboard-iframe {
+    width: 1100px;
+    height: min(700px, 80vh);
+  }
 }
