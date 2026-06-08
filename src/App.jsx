@@ -3,6 +3,7 @@ import Nav from './components/Nav'
 import Hero from './components/Hero'
 import Projects from './components/Projects'
 import AboutCourse from './components/AboutCourse'
+import Biography from './components/Biography'
 import Contact from './components/Contact'
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
         <Hero />
         <Projects />
         <AboutCourse />
+        <Biography />
         <Contact />
       </main>
       <footer className="site-footer">

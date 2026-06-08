@@ -28,7 +28,7 @@ export default function Contact() {
   return (
     <section id="contact" className="section">
       <div className="section-header reveal">
-        <span className="section-num">03</span>
+        <span className="section-num">04</span>
         <div>
           <h2>Contacto &amp; <em>Perfil</em></h2>
           <p className="section-lead">Conecta conmigo o revisa mi trabajo</p>

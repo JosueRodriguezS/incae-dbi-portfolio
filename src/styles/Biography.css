@@ -1,0 +1,165 @@
+/* ─── PORTFOLIO INTRO (AboutCourse) ──────────────────────────── */
+.portfolio-intro {
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 860px;
+}
+
+.portfolio-intro__text {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--text);
+  font-weight: 300;
+}
+
+.portfolio-intro__text strong {
+  color: var(--white);
+  font-weight: 500;
+}
+
+.portfolio-intro__framework {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--muted);
+  padding-left: 1rem;
+  border-left: 2px solid var(--accent2);
+}
+
+.portfolio-intro__framework em {
+  color: var(--accent2);
+  font-style: normal;
+}
+
+/* ─── BIOGRAPHY ───────────────────────────────────────────────── */
+.bio-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 3rem;
+  align-items: start;
+}
+
+.bio-name {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: var(--white);
+  margin-bottom: 0.25rem;
+}
+
+.bio-role {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1.75rem;
+}
+
+.bio-text {
+  font-size: 0.92rem;
+  line-height: 1.8;
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 1rem;
+}
+
+.bio-text strong { color: var(--text); font-weight: 500; }
+.bio-text em     { color: var(--accent2); font-style: normal; }
+
+/* Timeline */
+.bio-timeline {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.bio-timeline__item {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.bio-timeline__period {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  padding-top: 0.15rem;
+}
+
+.bio-timeline__role {
+  font-size: 0.88rem;
+  color: var(--white);
+  font-weight: 500;
+}
+
+.bio-timeline__org {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.bio-timeline__detail {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 0.3rem;
+  font-weight: 300;
+}
+
+/* Skills sidebar */
+.bio-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bio-skill-group {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  transition: border-color var(--ease);
+}
+
+.bio-skill-group:hover { border-color: rgba(56, 189, 248, 0.3); }
+
+.bio-skill-group__label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.bio-skill-group__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* Shared tag (also used in project cards) */
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 2px;
+  background: rgba(56, 189, 248, 0.06);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .bio-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .bio-timeline__item { grid-template-columns: 1fr; gap: 0.25rem; }
+}

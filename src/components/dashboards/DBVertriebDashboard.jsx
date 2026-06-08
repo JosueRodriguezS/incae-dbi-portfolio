@@ -1,10 +1,13 @@
 export default function DBVertriebDashboard() {
   return (
-    <iframe
-      src="https://vertrieb-pulse.lovable.app"
-      style={{ width: '100%', height: '90vh', border: 'none' }}
-      title="DB Vertrieb Operational Agility Dashboard"
-      allow="clipboard-write"
-    />
+    <div className="dashboard-iframe-wrapper">
+      <iframe
+        src="https://vertrieb-pulse.lovable.app"
+        title="DB Vertrieb Operational Agility Dashboard"
+        className="dashboard-iframe"
+        loading="lazy"
+        allow="clipboard-write; fullscreen"
+      />
+    </div>
   )
 }

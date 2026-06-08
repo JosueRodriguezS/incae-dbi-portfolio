@@ -24,9 +24,25 @@ export default function AboutCourse() {
       <div className="section-header reveal">
         <span className="section-num">02</span>
         <div>
-          <h2>Sobre el <em>Curso</em></h2>
-          <p className="section-lead">El contexto académico detrás de este portafolio</p>
+          <h2>Introducción &amp; <em>Justificación</em></h2>
+          <p className="section-lead">Qué es este portafolio, para qué existe y para quién lo creé</p>
         </div>
+      </div>
+
+      <div className="portfolio-intro reveal">
+        <p className="portfolio-intro__text">
+          Este portafolio es el registro vivo de seis casos de estudio analizados durante el curso
+          <strong> Digital Business Intelligence</strong> de INCAE Business School (2026). Existe para
+          demostrar que un ingeniero de datos puede ir más allá de los pipelines y traducir datos
+          en narrativas estratégicas que los directivos puedan usar. Lo creé para tres audiencias:
+          líderes técnicos que quieren ver rigor analítico, ejecutivos que necesitan contexto de
+          negocio, y reclutadores que buscan la intersección entre ingeniería y gobernanza de datos.
+        </p>
+        <p className="portfolio-intro__framework">
+          Cada caso se analiza a través del <em>marco de los seis pivotes de evolución digital</em>:
+          Alineamiento Estratégico, Cultura Digital, Innovación con el Cliente, Agilidad Operativa,
+          Acceso y Uso de Datos, y Ecosistemas Colaborativos.
+        </p>
       </div>
 
       <div className="course-grid">

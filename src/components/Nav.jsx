@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react'
 const LINKS = [
   { href: '#hero',     label: 'Inicio' },
   { href: '#projects', label: 'Proyectos' },
-  { href: '#course',   label: 'Curso' },
-  { href: '#contact',  label: 'Contacto' },
+  { href: '#course',     label: 'Intro' },
+  { href: '#biography',  label: 'Perfil' },
+  { href: '#contact',    label: 'Contacto' },
 ]
 
 export default function Nav() {
