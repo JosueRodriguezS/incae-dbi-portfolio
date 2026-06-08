@@ -190,6 +190,7 @@
   border: 1px solid var(--border);
   border-radius: 3px;
   padding: 0.25rem 0.55rem;
+  min-height: 28px;
   transition: color var(--ease), border-color var(--ease), background var(--ease);
 }
 
@@ -210,6 +211,7 @@
   border-radius: 3px;
   padding: 0.25rem 0.6rem;
   font-size: 0.78rem;
+  min-height: 28px;
   margin-left: 0.4rem;
   transition: color var(--ease), border-color var(--ease);
 }
@@ -227,7 +229,7 @@
 
 .dashboard-iframe {
   width: 100%;
-  height: 820px;
+  height: min(820px, 85vh);
   border: none;
   display: block;
 }
@@ -247,6 +249,43 @@
 
   /* Panel becomes a full-bordered box on mobile */
   .dashboard-panel { border-top: 1px solid var(--accent); border-radius: var(--radius); }
+
+  /* Header: meta shrinks, tabs scroll horizontally so they never overflow */
+  .dashboard-panel__header {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    overflow: hidden;
+  }
+  .dashboard-panel__meta { min-width: 0; flex-shrink: 1; }
   .dashboard-panel__subtitle { display: none; }
-  .dashboard-iframe { height: 600px; }
+  .dashboard-panel__title { font-size: 0.68rem; }
+
+  /* Scroll the tab strip without wrapping */
+  .dashboard-panel__actions {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;          /* hide scrollbar on Firefox */
+    flex-shrink: 0;
+    max-width: 60%;
+    gap: 0.3rem;
+  }
+  .dashboard-panel__actions::-webkit-scrollbar { display: none; }
+
+  /* Bigger touch targets on mobile (44px min height) */
+  .dashboard-panel__tab {
+    min-height: 44px;
+    min-width: 36px;
+    padding: 0 0.55rem;
+    flex-shrink: 0;
+  }
+  .dashboard-panel__close {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 0.6rem;
+    flex-shrink: 0;
+  }
+
+  /* Iframe fits the viewport height on mobile */
+  .dashboard-iframe { height: min(600px, 80vh); }
 }
